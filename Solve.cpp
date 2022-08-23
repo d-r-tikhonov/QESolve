@@ -3,9 +3,9 @@
 #include <math.h>
 #include <assert.h>
 
-short SolveR (double a, double b, double c, double *x1, double *x2);
-void SolveQE (int nRoots, double x1, double x2);
-bool moduleN (double n);
+short SolveQE (double a, double b, double c, double *x1, double *x2);
+void conSol (int nRoots, double x1, double x2);
+bool zeroNH (double n);
 
 enum caseSolutions {
     NO_ROOTS,
@@ -27,8 +27,8 @@ int main (void)
 
 	while (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
 	{
-        nRoots = SolveR (sCoeff, aCoeff, fTerm, &firstR, &secondR);
-        SolveQE (nRoots, firstR, secondR);
+        nRoots = SolveQE (sCoeff, aCoeff, fTerm, &firstR, &secondR);
+        conSol (nRoots, firstR, secondR);
         printf("Для следующей операции введите три коэффицинта (через пробел);\n");
         printf("Для выхода - любой нечисловой символ: ");
 	}
@@ -36,18 +36,18 @@ int main (void)
     return 0;
 }
 
-short SolveR (double a, double b, double c, double *firstR, double *secondR)
+short SolveQE (double a, double b, double c, double *firstR, double *secondR)
 {
 	double discriminant = 0.0;
 
-	if (moduleN (a))
+	if (zeroNH (a))
 	{
-		if (!moduleN (b))
+		if (!zeroNH (b))
 		{
 			*firstR = *secondR = -c/(b);
 			return ONE_ROOT;
         }
-		else if (moduleN(c))
+		else if (zeroNH(c))
 			return INF_ROOTS;
 		else
 			return NO_ROOTS;
@@ -59,7 +59,7 @@ short SolveR (double a, double b, double c, double *firstR, double *secondR)
 		if (discriminant < 0)
 			return NO_ROOTS;
 
-		if (moduleN(discriminant))
+		if (zeroNH(discriminant))
 		{
 			*firstR = *secondR = -b/(2*a);
 			return ONE_ROOT;
@@ -67,15 +67,15 @@ short SolveR (double a, double b, double c, double *firstR, double *secondR)
 
 		if (discriminant > 0)
 		{
-			*firstR = ((-b + sqrt_d)/(2*a));
-			*secondR = ((-b - sqrt_d)/(2*a));
+			*firstR = (-b + sqrt_d)/(2*a);
+			*secondR = (-b - sqrt_d)/(2*a);
 			return TWO_ROOTS;
         }
 
     return 0;
 }
 
-void SolveQE (int nRoots, double x1, double x2)
+void conSol (int nRoots, double x1, double x2)
 {
     switch (nRoots){
 		case NO_ROOTS:
@@ -99,7 +99,7 @@ void SolveQE (int nRoots, double x1, double x2)
 	}
 }
 
-bool moduleN (double n)
+bool zeroNH (double n)
 {
     const double epsilon = 1.e-7;
     if (n <= epsilon && n >= -epsilon) return true;
