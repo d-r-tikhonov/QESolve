@@ -3,9 +3,9 @@
 #include <math.h>
 #include <assert.h>
 
-short SolveQE (double a, double b, double c, double *x1, double *x2);
-void conSol (int nRoots, double x1, double x2);
-bool zeroNH (double n);
+short SolveQE(double a, double b, double c, double *x1, double *x2);
+void conSol(int nRoots, double x1, double x2);
+bool zeroNH(double n);
 
 enum caseSolutions {
     NO_ROOTS,
@@ -14,7 +14,7 @@ enum caseSolutions {
     INF_ROOTS
 };
 
-int main (void)
+int main(void)
 {
 	double sCoeff = 0.0;
 	double aCoeff = 0.0;
@@ -23,7 +23,7 @@ int main (void)
 	double secondR = 0.0;
 	short nRoots = 0;
 
-    printf("Введите коэффициенты уравнения (через пробел): ");
+    printf ("Введите коэффициенты уравнения (через пробел): ");
 
 	while (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
 	{
@@ -36,7 +36,7 @@ int main (void)
     return 0;
 }
 
-short SolveQE (double a, double b, double c, double *firstR, double *secondR)
+short SolveQE(double a, double b, double c, double *firstR, double *secondR)
 {
 	double discriminant = 0.0;
 
@@ -75,7 +75,7 @@ short SolveQE (double a, double b, double c, double *firstR, double *secondR)
     return 0;
 }
 
-void conSol (int nRoots, double x1, double x2)
+void conSol(int nRoots, double x1, double x2)
 {
     switch (nRoots){
 		case NO_ROOTS:
@@ -99,9 +99,8 @@ void conSol (int nRoots, double x1, double x2)
 	}
 }
 
-bool zeroNH (double n)
+bool zeroNH(double n)
 {
     const double epsilon = 1.e-7;
-    if (n <= epsilon && n >= -epsilon) return true;
-    return false;
+    return n <= epsilon && n >= -epsilon;
 }
