@@ -1,79 +1,117 @@
 #include <stdio.h>
 #include <TXlib.h>
+#include <math.h>
+#include <assert.h>
 
-short SolveQE(double a, double b, double c, double *x1, double *x2);
+short SolveR (double a, double b, double c, double *x1, double *x2);
+void SolveQE (int nRoots, double x1, double x2);
+bool moduleN (double n);
 
-int main(void){
+enum caseSolutions {
+    NO_ROOTS,
+    ONE_ROOT,
+    TWO_ROOTS,
+    INF_ROOTS
+};
 
-	double seniorCoeff = 0.0;
-	double averageCoeff = 0.0;
-	double freeTerm = 0.0;
+int main (void)
+{
+	double sCoeff = 0.0;
+	double aCoeff = 0.0;
+	double fTerm = 0.0;
 	double firstR = 0.0;
 	double secondR = 0.0;
 	short nRoots = 0;
+	char ansUser = 0;
 
-	printf ("Введите старший коэффицент: ");
-	scanf ("%lf", &seniorCoeff);
-	printf ("Введите средний коэффицент: ");
-	scanf ("%lf", &averageCoeff);
-	printf ("Введите свободный член: ");
-	scanf ("%lf", &freeTerm);
+	while (true)
+	{
+        printf("Введите коэффициенты уравнения (через пробел): ");
+        scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm);
 
-	nRoots = SolveQE(seniorCoeff, averageCoeff, freeTerm, &firstR, &secondR);
+        nRoots = SolveR (sCoeff, aCoeff, fTerm, &firstR, &secondR);
 
-	switch(nRoots){
-		case 0:
-            printf("Ваше уравнение не имеет корней.");
-           	break;
-		case 1:
-			printf("Ваше уравнение имеет 1 корень: %.2lf.", firstR);
-			break;
-		case 2:
-			printf("Ваше уравнение - квадратное и имеет 2 корня: x1 = %.2lf и x2 = %.2lf.", firstR, secondR);
-			break;
-		default:
-			printf("Ваше уравнение имеет бесконечно много корней.");
-			break;
+        SolveQE (nRoots, firstR, secondR);
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("Желаете решить ещё одно уравнение?(y/n): ");
+        getchar();
+        ansUser = getchar();
+        if (ansUser == 'n') break;
 	}
 
-	return 0;
+    return 0;
 }
 
-short SolveQE(double a, double b, double c, double *firstR, double *secondR){
-
+short SolveR (double a, double b, double c, double *firstR, double *secondR)
+{
 	double discriminant = 0.0;
 
-	if (a == 0)
+	assert (isfinite(a));
+	assert (isfinite(b));
+	assert (isfinite(c));
+
+	if (moduleN (a))
 	{
-		if (b != 0)
+		if (!moduleN (b))
 		{
-			*firstR=*secondR=(-c)/(b);
-			return 1;
+			*firstR = *secondR = -c/(b);
+			return ONE_ROOT;
         }
-		else if (c == 0)
-			return -1;
+		else if (moduleN(c))
+			return INF_ROOTS;
 		else
-			return 0;
+			return NO_ROOTS;
 	}
 
 	discriminant = b*b - 4*a*c;
-
-	if (a != 0){
+	double sqrt_d = sqrt(discriminant);
 
 		if (discriminant < 0)
-			return 0;
+			return NO_ROOTS;
 
-		if (discriminant == 0)
+		if (moduleN(discriminant))
 		{
-			*firstR = *secondR = (-b)/(2*a);
-			return 1;
+			*firstR = *secondR = -b/(2*a);
+			return ONE_ROOT;
         }
 
 		if (discriminant > 0)
 		{
-			*firstR = ((-b + sqrt(discriminant))/(2*a));
-			*secondR = ((-b - sqrt(discriminant))/(2*a));
-			return 2;
+			*firstR = ((-b + sqrt_d)/(2*a));
+			*secondR = ((-b - sqrt_d)/(2*a));
+			return TWO_ROOTS;
         }
+
+    return 0;
+}
+
+void SolveQE (int nRoots, double x1, double x2)
+{
+    switch (nRoots){
+		case NO_ROOTS:
+            printf ("Ваше уравнение не имеет корней.\n");
+           	break;
+
+		case ONE_ROOT:
+			printf ("Ваше уравнение имеет 1 корень: %.2lf.\n", x1);
+			break;
+
+		case TWO_ROOTS:
+			printf ("Ваше уравнение - квадратное и имеет 2 корня: x1 = %.2lf и x2 = %.2lf.\n", x1, x2);
+			break;
+
+		case INF_ROOTS:
+			printf ("Ваше уравнение имеет бесконечно много корней.\n");
+			break;
+
+        default:
+            printf("Unknown error!");
 	}
+}
+
+bool moduleN (double n)
+{
+    const double epsilon = 1.e-7;
+    if (n <= epsilon && n >= -epsilon) return true;
+    return false;
 }
