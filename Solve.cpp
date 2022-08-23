@@ -22,21 +22,15 @@ int main (void)
 	double firstR = 0.0;
 	double secondR = 0.0;
 	short nRoots = 0;
-	char ansUser = 0;
 
-	while (true)
+    printf("Введите коэффициенты уравнения (через пробел): ");
+
+	while (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
 	{
-        printf("Введите коэффициенты уравнения (через пробел): ");
-        scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm);
-
         nRoots = SolveR (sCoeff, aCoeff, fTerm, &firstR, &secondR);
-
         SolveQE (nRoots, firstR, secondR);
-        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-        printf("Желаете решить ещё одно уравнение?(y/n): ");
-        getchar();
-        ansUser = getchar();
-        if (ansUser == 'n') break;
+        printf("Для следующей операции введите три коэффицинта (через пробел);\n");
+        printf("Для выхода - любой нечисловой символ: ");
 	}
 
     return 0;
@@ -45,10 +39,6 @@ int main (void)
 short SolveR (double a, double b, double c, double *firstR, double *secondR)
 {
 	double discriminant = 0.0;
-
-	assert (isfinite(a));
-	assert (isfinite(b));
-	assert (isfinite(c));
 
 	if (moduleN (a))
 	{
