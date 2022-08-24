@@ -22,16 +22,25 @@ int main(void)
 	double firstR = 0.0;
 	double secondR = 0.0;
 	short nRoots = 0;
+	bool quit = false;
+	char testForQuit = 0;
 
-    printf ("Введите коэффициенты уравнения (через пробел): ");
-
-	while (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
+	do
 	{
-        nRoots = SolveQE (sCoeff, aCoeff, fTerm, &firstR, &secondR);
-        conSol (nRoots, firstR, secondR);
-        printf("Для следующей операции введите три коэффицинта (через пробел);\n");
-        printf("Для выхода - любой нечисловой символ: ");
+        printf ("Введите коэффициенты уравнения (через пробел), для выхода - 'q': ");
+    	if (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
+    	{
+        	nRoots = SolveQE (sCoeff, aCoeff, fTerm, &firstR, &secondR);
+        	conSol (nRoots, firstR, secondR);
+    	}
+   		else
+   		{
+            scanf("%c",&testForQuit);
+        	if (testForQuit == 'q') quit = true;
+        	else printf("Вы допустили ошибку при вводе!\n");
+    	}
 	}
+	while (!quit);
 
     return 0;
 }
