@@ -5,7 +5,7 @@
  * - \ref Съешь ещё этих мягких французских булочек!
  * - \subpage userGuide "Как пользоваться программой?"
  * - \subpage authors 	"Авторы программы"
- */ 
+ */
 
 /*! \page userGuide Как пользоваться программой?
  *
@@ -42,11 +42,14 @@ short SolveQE(double a, double b, double c, double *x1, double *x2);
 void conSol(int nRoots, double x1, double x2);
 ///    Проверяет находится ли число в окрестности нуля
 ///    \param 	n 	Число, которое подлежит проверке
-///    \return		True, в случае, если число лежит в окрестности нуля, false - в ином случае 
+///    \return		True, в случае, если число лежит в окрестности нуля, false - в ином случае
 bool zeroNH(double n);
-
+bool equivalentNH(double n, double equivalent);
+void testQE(double a, double b, double c,short nRoots_real, double x1_real, double x2_real);
+void error(short nRoots, double x1, double x2, short nRoots_real, double x1_real, double x2_real);
 /// Набор возможных состояний корней уравнения
-enum caseSolutions {
+
+enum caseSolutions{
     NO_ROOTS,	///< Указывает, что у уравнения нет корней
     ONE_ROOT,	///< Указывает, что у уравнения один корень
     TWO_ROOTS,	///< Указывает, что у уравнения два корня
@@ -103,24 +106,39 @@ int main(void)
 	double secondR = 0.0;
 	short nRoots = 0;
 	bool quit = false;
-	char testForQuit = 0;
+	char ansUser = 0;
 
-	do
+	printf("Выберите режим работы программы ('s' - для решения уравнения, 't' - для юнит-тестов): ");
+	scanf("%c", &ansUser);
+
+	if(ansUser == 's')
 	{
-        printf ("Введите коэффициенты уравнения (через пробел), для выхода - 'q': ");
-    	if (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
-    	{
-        	nRoots = SolveQE (sCoeff, aCoeff, fTerm, &firstR, &secondR);
-        	conSol (nRoots, firstR, secondR);
-    	}
-   		else
-   		{
-            scanf("%c",&testForQuit);
-        	if (testForQuit == 'q') quit = true;
-        	else printf("Вы допустили ошибку при вводе!\n");
-    	}
+		do
+		{
+	        printf ("Введите коэффициенты уравнения (через пробел), для выхода - 'q': ");
+	    	if (scanf ("%lf%lf%lf", &sCoeff, &aCoeff, &fTerm) == 3)
+	    	{
+	        	nRoots = SolveQE (sCoeff, aCoeff, fTerm, &firstR, &secondR);
+	        	conSol (nRoots, firstR, secondR);
+	    	}
+	   		else
+	   		{
+	            scanf("%c",&ansUser);
+	        	if (ansUser == 'q') quit = true;
+	        	else printf("Вы допустили ошибку при вводе!\n");
+	    	}
+		}
+		while (!quit);
 	}
-	while (!quit);
+
+	if(ansUser == 't')
+	{
+	testQE(1,0,-2,2,sqrt(2),-sqrt(2));
+	testQE(0,0,0,INF_ROOTS,0,0);
+	testQE(0,0,2,NO_ROOTS,0,0);
+	testQE(49,7,-2,TWO_ROOTS,0.14,-0.28);
+	testQE(0,2,5,ONE_ROOT,-2.5,-2.5);
+	}
 
     return 0;
 }
@@ -131,7 +149,7 @@ short SolveQE(double a, double b, double c, double *firstR, double *secondR)
 
 	if (zeroNH (a))
 	{
-		if (!zeroNH (b))
+		if (!zeroNH(b))
 		{
 			*firstR = *secondR = -c/(b);
 			return ONE_ROOT;
@@ -143,7 +161,6 @@ short SolveQE(double a, double b, double c, double *firstR, double *secondR)
 	}
 
 	discriminant = b*b - 4*a*c;
-	double sqrt_d = sqrt(discriminant);
 
 		if (discriminant < 0)
 			return NO_ROOTS;
@@ -156,6 +173,7 @@ short SolveQE(double a, double b, double c, double *firstR, double *secondR)
 
 		if (discriminant > 0)
 		{
+			double sqrt_d = sqrt(discriminant);
 			*firstR = (-b + sqrt_d)/(2*a);
 			*secondR = (-b - sqrt_d)/(2*a);
 			return TWO_ROOTS;
@@ -188,8 +206,38 @@ void conSol(int nRoots, double x1, double x2)
 	}
 }
 
+bool equivalentNH(double n, double equivalent)
+{
+    const double epsilon = 1.e-1;
+    return n <= equivalent + epsilon && n >= equivalent-epsilon;
+}
+
 bool zeroNH(double n)
 {
-    const double epsilon = 1.e-7;
+    const double epsilon = 1.e-1;
     return n <= epsilon && n >= -epsilon;
+}
+
+void testQE(double a, double b, double c,short nRoots_real, double x1_real, double x2_real)
+{
+    double x1 = 0.0;
+    double x2 = 0.0;
+	short nRoots = 0;
+	printf("a = %.2lf, b = %.2lf, c = %.2lf. ",a,b,c);
+	nRoots = SolveQE(a,b,c,&x1,&x2);
+	error(nRoots, x1, x2, nRoots_real, x1_real, x2_real);
+}
+
+void error(short nRoots, double x1, double x2, short nRoots_real, double x1_real, double x2_real)
+{
+
+	if(!(nRoots == nRoots_real && equivalentNH(x1, x1_real) && equivalentNH(x2, x2_real)))
+	{
+		printf("FAILED: nRoots = %d, x1 = %lf, x2 = %lf\n"
+               "EXPECTED: nRoots = %d, x1 = %lf, x2 = %lf\n", nRoots, x1, x2, nRoots_real, x1_real, x2_real);
+	}
+	else
+	{
+        printf("STATUS: Проверка прошла успешно\n");
+    }
 }
