@@ -47,8 +47,10 @@ bool zeroNH(double n);
 bool equivalentNH(double n, double equivalent);
 void testQE(double a, double b, double c,short nRoots_real, double x1_real, double x2_real);
 void error(short nRoots, double x1, double x2, short nRoots_real, double x1_real, double x2_real);
-/// Набор возможных состояний корней уравнения
+void unit_tests(void);
+void clearBuffer(void);
 
+/// Набор возможных состояний корней уравнения
 enum caseSolutions{
     NO_ROOTS,	///< Указывает, что у уравнения нет корней
     ONE_ROOT,	///< Указывает, что у уравнения один корень
@@ -125,25 +127,18 @@ int main(void)
 	   		{
 	            scanf("%c",&ansUser);
 	        	if (ansUser == 'q') quit = true;
-	        	else printf("Вы допустили ошибку при вводе!\n");
+	        	else
+	        	{
+                    printf("Вы допустили ошибку при вводе!\n");
+                    clearBuffer();
+                }
 	    	}
 		}
 		while (!quit);
 	}
 
 	if(ansUser == 't')
-	{
-		double a[] = {1,0,0,49,0};
-		double b[] = {0,0,0,7,2};
-		double c[] = {-2,0,2,-2,5};
-		double nRoots_real[]= {2, INF_ROOTS, NO_ROOTS, TWO_ROOTS,ONE_ROOT};
-		double x1[] = {sqrt(2),0,0,0.14,-2.5};
-		double x2[] = {-sqrt(2),0,0,-0.28,-2.5};
-		for (int i = 0; i <= sizeof(a)/sizeof(a[0]), i++)
-		{
-			testQE(a[i],b[i],c[i],nRoots_real[i],x1[i],x2[i]);
-		}
-	}
+        unit_tests();
 
     return 0;
 }
@@ -223,7 +218,7 @@ bool zeroNH(double n)
     return n <= epsilon && n >= -epsilon;
 }
 
-void testQE(double a, double b, double c,short nRoots_real, double x1_real, double x2_real)
+void testQE(double a, double b, double c, short nRoots_real, double x1_real, double x2_real)
 {
     double x1 = 0.0;
     double x2 = 0.0;
@@ -238,11 +233,31 @@ void error(short nRoots, double x1, double x2, short nRoots_real, double x1_real
 
 	if(!(nRoots == nRoots_real && equivalentNH(x1, x1_real) && equivalentNH(x2, x2_real)))
 	{
-		printf("FAILED: nRoots = %d, x1 = %lf, x2 = %lf\n"
+		printf("\nFAILED: nRoots = %d, x1 = %lf, x2 = %lf\n"
                "EXPECTED: nRoots = %d, x1 = %lf, x2 = %lf\n", nRoots, x1, x2, nRoots_real, x1_real, x2_real);
 	}
 	else
 	{
-        printf("STATUS: Проверка прошла успешно\n");
+        printf("\nSTATUS: Проверка прошла успешно\n");
     }
+}
+
+void unit_tests(void)
+{
+    double a[] = {1, 0, 0, 49, 0, NAN, 1337};
+    double b[] = {0, 0, 0, 7, 2, 0, NAN};
+    double c[] = {-2, 0, 2, -2, 5, 50, 228};
+    short nRoots_real[]= {2, INF_ROOTS, NO_ROOTS, TWO_ROOTS, ONE_ROOT, 0, 0};
+    double x1[] = {sqrt(2), 0, 0, 0.14, -2.5, 0, 0};
+    double x2[] = {-sqrt(2), 0, 0, -0.28, -2.5, 0, 0};
+    for (unsigned i = 0; i < sizeof(a)/sizeof(a[0]); i++)
+    {
+        testQE(a[i],b[i],c[i],nRoots_real[i],x1[i],x2[i]);
+    }
+}
+
+void clearBuffer(void)
+{
+    int c = 0;
+    while ((c = getchar()) != '\n');
 }
