@@ -133,11 +133,16 @@ int main(void)
 
 	if(ansUser == 't')
 	{
-	testQE(1,0,-2,2,sqrt(2),-sqrt(2));
-	testQE(0,0,0,INF_ROOTS,0,0);
-	testQE(0,0,2,NO_ROOTS,0,0);
-	testQE(49,7,-2,TWO_ROOTS,0.14,-0.28);
-	testQE(0,2,5,ONE_ROOT,-2.5,-2.5);
+		double a[] = {1,0,0,49,0};
+		double b[] = {0,0,0,7,2};
+		double c[] = {-2,0,2,-2,5};
+		double nRoots_real[]= {2, INF_ROOTS, NO_ROOTS, TWO_ROOTS,ONE_ROOT};
+		double x1[] = {sqrt(2),0,0,0.14,-2.5};
+		double x2[] = {-sqrt(2),0,0,-0.28,-2.5};
+		for (int i = 0; i <= sizeof(a)/sizeof(a[0]), i++)
+		{
+			testQE(a[i],b[i],c[i],nRoots_real[i],x1[i],x2[i]);
+		}
 	}
 
     return 0;
